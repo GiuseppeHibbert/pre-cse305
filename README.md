@@ -1,2 +1,2 @@
 # pre-cse306
-pre for cse305 team project
+pre for cse306 team project
