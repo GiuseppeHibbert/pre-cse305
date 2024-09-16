@@ -1,4 +1,5 @@
 DATE        UBIT      DURATION    ACTIVITY & TOOL DESCRIPTION
 2024/9/12   kevinpas  15 minutes  added activity csv files, pushed to github, and scheduled further group meetings.
 2024/9/12   kevinpas  60 minutes  read over documentation, split up the work between the team, and edited and pushed main.c file after beginning development of a csv file reader function. 
-2024/9/13   kevinpas  15 minutes  Started some code to begin the max min mean fields. 
+2024/9/13   kevinpas  15 minutes  Started some code to begin the max min mean fields.
+2024/9/16   kevinpas  25 minutes  Continued work on the max field for the assignment. 
