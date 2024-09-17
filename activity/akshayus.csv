@@ -1,2 +1,3 @@
 DATE        UBIT      DURATION    ACTIVITY & TOOL DESCRIPTION
 2024/9/12   akshayus  20 mins     Read the document and tried to understand the requirements
+2024/9/17   akshayus  2.5 hrs     Added Remove_newline,csv_parse and records_field. Remove_newline to trim newline character,csv_parse is to parse the line and handle double quoted and comma inside usable line and records field to match the record
