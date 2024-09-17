@@ -34,10 +34,85 @@ double max_field(int field,int header, FILE *file){
 double mean(int field,int header, FILE *file){
     return 0;}
 
+// Helper function to remove the newline character if present
+void remove_newline(char *line) {
+    size_t len = strlen(line);
+    if (len > 0 && line[len - 1] == '\n') {
+        line[len - 1] = '\0';
+    }
+}
 
+//CSV parser that handles quoted fields
+int csv_parse(char *line, char *fields[], int max_fields) {
+    int field_count = 0;
+    int quotes = 0;
+    char *field_start = line;
+    for (char *ptr = line; *ptr != '\0'; ++ptr) {
+        if (*ptr == '"') {
+            quotes = !quotes;  // Toggle quote state
+        } else if (*ptr == ',' && !quotes) {
+            *ptr = '\0';  // End of field
+            fields[field_count++] = field_start;
+            field_start = ptr + 1;
+            if (field_count >= max_fields) {
+                break;
+            }
+        }
+    }
+    fields[field_count++] = field_start;  // Add last field
+    // Remove quotes from fields, if any
+    for (int i = 0; i < field_count; i++) {
+        if (fields[i][0] == '"' && fields[i][strlen(fields[i]) - 1] == '"') {
+            fields[i][strlen(fields[i]) - 1] = '\0';  
+            fields[i]++; 
+        }
+    }
+    return field_count;
+}
 
-int main(int argc, char * argv[]){
-    // load the csv file in for input.
-    printf("Hello world.\n");
+// Function to find and print records where the specified field matches the value.
+void find_matching_records(int field_index, const char *target_value, int has_header, FILE *file) {
+    char line[LINE_MAX];
+    int first_line = 1;
+    double target_number = atof(target_value);
+    rewind(file); 
+    while (fgets(line, sizeof(line), file)) {
+        char final_line[Line_max];
+        strcpy(final_line, line);// copying the whole line to return if match found
+        remove_newline(line);
+        if (first_line && has_header) {
+            first_line = 0;
+            continue;  // Skip the header
+        }
+        char *fields[Field_max];
+        int field_count = csv_parse(line, fields, Field_max);
+        if (field_index >= field_count) {
+            fprintf(stderr, "Error: Field index out of range.\n");
+            return;
+        }
+        double field_number = atof(fields[field_index]);
+        if (field_number == target_number) {
+            printf("%s\n", final_line);  // Print matching line
+        }
+    }
+}
+
+int main(int argc, char *argv[]) {
+    if (argc < 4) {
+        return EXIT_FAILURE;
+    }
+    int field_index = atoi(argv[2]);
+    char *target_value = argv[3];
+    char *filename = argv[4];
+    int has_header = (argc == 6 && strcmp(argv[5], "-h") == 0);
+    FILE *file = fopen(filename, "r");
+    if (!file) {
+        perror("Error opening file");
+        return EXIT_FAILURE;
+    }
+    find_matching_records(field_index, target_value, has_header, file);
+
+    fclose(file);
     return 0;
 }
+
