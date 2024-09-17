@@ -5,7 +5,7 @@
 #include <limits.h>
 #define Line_max 999
 #define Field_max 999 
-
+  
 
 int is_a_number(const char *string){//for max min mean fields
     for(int i=0;string[i]!='\0';i++){// iterating through string
@@ -20,15 +20,17 @@ double min_field(int field,int head_line, FILE *file){
         while( fgets(line_on,Line_max, file)){
             if(first_line_field_val && head_line){
                 first_line_field_val=0;
-                continue;}// This skips the head line if its not
-            char *copying = strdup(line_on);
+                continue;}// This skips the head line if its not a header line for descriptions
+            char *copying_string = strdup(line_on);
             double = current_field = 0;
-            char * break_string; 
-                return 0;
-        }}
+            char *break_string;
+            while(copying_string<line_on[current_field]){
+                copying_string = line_on[current_field];
+                current_field+=1;}
+                
+                return 0;}}
 double max_field(int field,int header, FILE *file){
-    return 0;
-}
+    return 0;}
 double mean(int field,int header, FILE *file){
     return 0;}
 
