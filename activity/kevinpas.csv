@@ -3,4 +3,4 @@ DATE        UBIT      DURATION    ACTIVITY & TOOL DESCRIPTION
 2024/9/12   kevinpas  60 minutes  read over documentation, split up the work between the team, and edited and pushed main.c file after beginning development of a csv file reader function. 
 2024/9/13   kevinpas  15 minutes  Started some code to begin the max min mean fields.
 2024/9/16   kevinpas  25 minutes  Continued work on the min field for the assignment.
-2024/9/18   kevinpas  30 minutes  Finished the min field code in main.c"
+2024/9/18   kevinpas  35 minutes  Finished the min field code in main.c. Finished max field by switching comparisons on the min field function"
