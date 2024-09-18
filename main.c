@@ -7,12 +7,19 @@
 #define Line_max 999
 #define Field_max 999 
   
-
-int is_a_number(const char *string){//for max min mean fields
-    for(int i=0;string[i]!='\0';i++){// iterating through string
-        if(!isdigit(string[i]) && string[i] != '-' && string[i] !='.')
-            return 0;}
-    return 1;} // is a num if returns 0.
+int is_a_number(const char *string){
+    char *string_to_strip=strdup(string); 
+    if(string_to_strip==NULL){return 0;}
+    while(isspace(*string_to_strip)){
+         string_to_strip++;} // skipping leading spaces
+    if(*string_to_strip=='\0'){
+        return 0;} // checking if empty string after spaces
+    for(int i=0;string_to_strip[i] != '\0'; i++) {
+        if(!isdigit(string_to_strip[i])&&string_to_strip[i]!='-'&&string_to_strip[i]!='.'){
+            free(string_to_strip);
+            return 0;}}
+    free(string_to_strip);
+    return 1;}
 double min_field(int field,int head_line, FILE *file){
     double min = DBL_MAX;// using the max value to compare with the current fields number 
     int first_line_field_val = 1;// first line
