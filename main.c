@@ -13,10 +13,10 @@ int is_a_number(const char *string){//for max min mean fields
             return 0;}
     return 1;} // is a num if returns 0.
 double min_field(int field,int head_line, FILE *file){
-    double min = DBL_MAX;// using the max to get compare with the current fields number 
+    double min = DBL_MAX;// using the max value to compare with the current fields number 
     int first_line_field_val = 1;// first line
     char line_on[Line_max];
-    rewind(file)
+    rewind(file);
         while( fgets(line_on,Line_max, file)){
             if(first_line_field_val && head_line){
                 first_line_field_val=0;
@@ -33,9 +33,28 @@ double min_field(int field,int head_line, FILE *file){
                     current_field++;}
                     free(copying_string);}
                     return min;}
-          
-double max_field(int field,int header, FILE *file){
-    return 0;}
+double max_field(int field,int head_line, FILE *file){
+    double max = DBL_MIN;// using the min to use to compare with the current fields number 
+    int first_line_field_val = 1;// first line
+    char line_on[Line_max];
+    rewind(file);
+        while( fgets(line_on,Line_max, file)){
+            if(first_line_field_val && head_line){
+                first_line_field_val=0;
+                continue;}// This skips the head line if its not a header line for descriptions
+            char *copying_string = strdup(line_on);
+            int current_field = 0;
+            char *break_string =strtok(copying_string,",");
+            while(break_string){
+                if(current_field==field&&is_a_number(break_string)){
+                    double value = atof(break_string);
+                if(value>max){
+                    max=value;}}
+                    break_string=strtok(NULL,",");
+                    current_field++;}
+                    free(copying_string);}
+                    return max;}          
+
 double mean(int field,int header, FILE *file){
     return 0;}
 
