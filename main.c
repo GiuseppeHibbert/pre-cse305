@@ -22,13 +22,18 @@ double min_field(int field,int head_line, FILE *file){
                 first_line_field_val=0;
                 continue;}// This skips the head line if its not a header line for descriptions
             char *copying_string = strdup(line_on);
-            double = current_field = 0;
-            char *break_string;
-            while(copying_string<line_on[current_field]){
-                copying_string = line_on[current_field];
-                current_field+=1;}
-                
-                return 0;}}
+            int current_field = 0;
+            char *break_string =strtok(copying_string,",");
+            while(break_string){
+                if(current_field==field&&is_a_number(break_string)){
+                    double value = atof(break_string);
+                if(value<min){
+                    min=value;}}
+                    break_string=strtok(NULL,",");
+                    current_field++;}
+                    free(copying_string);}
+                    return min;}
+          
 double max_field(int field,int header, FILE *file){
     return 0;}
 double mean(int field,int header, FILE *file){
