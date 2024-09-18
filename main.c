@@ -4,6 +4,7 @@
 #include <float.h>
 #include <limits.h>
 #include <ctype.h>
+#include <stdbool.h>
 #define Line_max 999
 #define Field_max 999 
   
@@ -150,28 +151,105 @@ void find_matching_records(int field_index, const char *target_value, int has_he
         }
     }
 }
-/*
-void find_record_count(FILE *file){
+
+// Determines the record count of the file. It will return the number of lines if no header is present, and if the header is present it will return number of lines minus one.
+void find_record_count(FILE *file, int argc, char *argv[]){
     bool headerPresent = false;
     bool recordsRequested = false;
     for (int i=1; i<argc-1; i++){ // Traverse the command-line arguments and search for three things, is header provided, is record provided, and are they both provided?
         if (argv[i] == "-h"){
             headerPresent == true;
+                    
         }
         if (argv[i] == "-r"){
             recordsRequested == true;
+                    
         }
     }
     if (!recordsRequested){
+        printf("Records not requested.\n");
         return;
+            
     }
-    if (recordsRequested && headerPresent){ // W.I.P -- Traverse the whole file and for each line read in not including the header line add one, To be added the same function when the header is not present.
+    if (recordsRequested && headerPresent){ // W.I.P -- Traverse the whole file and for each line read in not including the header line add one, To be added the same function when the header is not present
+        int lineCount = 0;
         char *line = fgets(line,Line_max,file);
-        while(line!=NULL)
-        line = fgets(line, Line_max, file);
- }
+    <<<<<<< HEAD
+                while(line!=NULL){
+                    line = fgets(line, Line_max, file);
+                    lineCount++;
+                            
+                }
+        printf("%d\n", lineCount);
+    }
+    else{
+        int lineCount = 1;
+        char *line = fgets(line,Line_max,file);
+        while(line!=NULL){
+
+            line = fgets(line,Line_max,file);
+            lineCount++;
+                    
+        }
+        printf("%d\n", lineCount);
+            
+    }
+    printf("find_record_count success\n");
+    
 }
-*/
+// Reads in the file's first line and determines the number of fields.
+void display_field_count(FILE *file, int argc, char * argv[]){
+    bool fieldCountRequested = false;
+    for (int i=1; i<argc-1;i++){
+        if (argv[i] == "-f"){
+            fieldCountRequested = true;
+                    
+        }
+            
+    }
+    if (!fieldCountRequested){
+        printf("Field count not requested.\n");
+        return;
+            
+    }
+    char cur;
+    int fieldCount = 0;
+    bool startquoteFlag = false;
+    bool endquoteFlag = false;
+
+    while(cur = fgetc(file)!='\0'){
+        if(cur == '"' && !startquoteFlag && !endquoteFlag){ // String begun, disregard all commas until the end quote is present, followed by a comma.
+            startquoteFlag = true;
+            continue;
+        }
+        if(cur == '"' && startquoteFlag && !endquoteFlag){
+            startquoteFlag = false;
+            continue;
+                    
+        }
+        if(cur == ',' && !startquoteFlag && !endquoteFlag){
+            fieldCount++;
+                    
+        }
+        else{
+            continue;
+                    
+        }
+
+
+            
+    }
+    if(cur=='\0'){
+        fieldCount++;
+            
+    }
+    printf("%d", fieldCount);
+
+    printf("fieldCount success\n");
+    
+}
+
+
 /*int main(int argc, char *argv[]) {
     if (argc < 4) {
         perror("Invalid arguments provided.\n");
@@ -219,5 +297,6 @@ int main(int argc,char *argv[]){
             find_matching_records(field,value, has_header,file);}
             else if(strcmp(argv[i],"-h") == 0) {
             has_header=1;}}
+    
     fclose(file);
     return 0;}
