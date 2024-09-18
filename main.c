@@ -3,13 +3,14 @@
 #include <string.h>
 #include <float.h>
 #include <limits.h>
+#include <ctype.h>
 #define Line_max 999
 #define Field_max 999 
   
 
 int is_a_number(const char *string){//for max min mean fields
     for(int i=0;string[i]!='\0';i++){// iterating through string
-        if(!isdigit(str[i]) && str[i] != '-' && str[i] !='.')
+        if(!isdigit(string[i]) && string[i] != '-' && string[i] !='.')
             return 0;}
     return 1;} // is a num if returns 0.
 double min_field(int field,int head_line, FILE *file){
@@ -123,6 +124,7 @@ void find_matching_records(int field_index, const char *target_value, int has_he
 
 int main(int argc, char *argv[]) {
     if (argc < 4) {
+        perror("Invalid arguments provided.\n");
         return EXIT_FAILURE;
     }
     int field_index = atoi(argv[2]);

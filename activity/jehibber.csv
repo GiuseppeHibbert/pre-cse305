@@ -3,3 +3,4 @@ DATE        UBIT      DURATION    ACTIVITY & TOOL DESCRIPTION
 
 2024/9/12   jehibber  15 minutes  added main.c, pushed to github, and corresponded with Kpasato
 2024/9/12   jehibber  60 minutes  read over documentation and digested project, added sample_file.csv to the local repository(05020004-eng.csv from CSE306 project handout).
+2024/9/18   jehibber  20 minutes  Read over implementation and added fixes to lines 13, changing str to string. Added library <ctype.h> for function isdigit. Added a perror statement for invalid arguments.
