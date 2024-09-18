@@ -162,13 +162,10 @@ void find_record_count(FILE *file){
         char *line = fgets(line,Line_max,file);
         while(line!=NULL)
         line = fgets(line, Line_max, file);
-        
-    }
-    
+ }
 }
 */
-
-int main(int argc, char *argv[]) {
+/*int main(int argc, char *argv[]) {
     if (argc < 4) {
         perror("Invalid arguments provided.\n");
         return EXIT_FAILURE;
@@ -180,11 +177,39 @@ int main(int argc, char *argv[]) {
     FILE *file = fopen(filename, "r");
     if (!file) {
         perror("Error opening file");
-        return EXIT_FAILURE;
-    }
-    find_matching_records(field_index, target_value, has_header, file);
-
+        return EXIT_FAILURE;}
+  find_matching_records(field_index, target_value, has_header, file);
+  pclose(file);
+  return 0;
+*/
+int main(int argc,char *argv[]){
+    if(argc< 4){
+        perror("Invalid arguments provided.\n");
+        return EXIT_FAILURE;}
+    char *filename= argv[argc-1];  // The CSV file is always the last argument
+    int has_header=0;
+    FILE *file=fopen(filename,"r");
+    if(!file){
+        perror("Error opening file");
+        return EXIT_FAILURE;}
+     for(int i=1;i <argc -1;i++){
+        if(strcmp(argv[i],"-min") ==0){
+            int field= atoi(argv[++i]);
+            double min_val= min_field(field,has_header,file);
+            printf("Min:%.2f\n",min_val);}
+            else if (strcmp(argv[i],"-max")==0){
+            int field=atoi(argv[++i]);
+            double max_val=max_field(field,has_header,file);
+            printf("Max: %.2f\n",max_val);}
+            else if(strcmp(argv[i],"-mean")==0){
+            int field = atoi(argv[++i]);
+            double mean_val = mean(field, has_header, file);
+            printf("Mean:%.2f\n", mean_val);}
+            else if(strcmp(argv[i], "-records") == 0) {
+            int field = atoi(argv[++i]);
+            char *value = argv[++i];
+            find_matching_records(field, value, has_header, file);}
+            else if(strcmp(argv[i], "-h") == 0) {
+            has_header=1;}}
     fclose(file);
-    return 0;
-}
-
+    return 0;}
