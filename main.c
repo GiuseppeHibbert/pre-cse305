@@ -121,6 +121,30 @@ void find_matching_records(int field_index, const char *target_value, int has_he
         }
     }
 }
+/*
+void find_record_count(FILE *file){
+    bool headerPresent = false;
+    bool recordsRequested = false;
+    for (int i=1; i<argc-1; i++){ // Traverse the command-line arguments and search for three things, is header provided, is record provided, and are they both provided?
+        if (argv[i] == "-h"){
+            headerPresent == true;
+        }
+        if (argv[i] == "-r"){
+            recordsRequested == true;
+        }
+    }
+    if (!recordsRequested){
+        return;
+    }
+    if (recordsRequested && headerPresent){ // W.I.P -- Traverse the whole file and for each line read in not including the header line add one, To be added the same function when the header is not present.
+        char *line = fgets(line,Line_max,file);
+        while(line!=NULL)
+        line = fgets(line, Line_max, file);
+        
+    }
+    
+}
+*/
 
 int main(int argc, char *argv[]) {
     if (argc < 4) {
