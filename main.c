@@ -45,7 +45,7 @@ double max_field(int field,int head_line, FILE *file){
                 continue;}// This skips the head line if its not a header line for descriptions
             char *copying_string = strdup(line_on);
             int current_field = 0;
-            char *break_string =strtok(copying_string,",");
+            char *break_string =strtok(copying_string,",");// splitting up by ","
             while(break_string){
                 if(current_field==field&&is_a_number(break_string)){
                     double value = atof(break_string);
@@ -56,9 +56,31 @@ double max_field(int field,int head_line, FILE *file){
                     free(copying_string);}
                     return max;}          
 
-double mean(int field,int header, FILE *file){
-    return 0;}
-
+double mean(int field,int head_line, FILE *file){
+    int counter= 0;// counts the lines
+    double total=0.0; // add amount in each line to this
+    int first_line_field_val=1;
+    char line_on[Line_max];
+    rewind(file);
+    while (fgets(line_on,Line_max,file)){
+        if (first_line_field_val &&head_line){
+            first_line_field_val =0;
+            continue;}
+        char *copying_string=strdup(line_on);
+        int current_field=0;
+        char *break_string =strtok(copying_string,",");// splitting up by ","
+        while(break_string){
+            if(current_field==field &&is_a_number(break_string)) {
+                double value= atof(break_string);
+                total+=value;
+                counter++;}
+            break_string =strtok(NULL, ",");
+            current_field++;}
+        free(copying_string);}
+    if(counter==0){
+        return 0;}
+    int get_mean = total/counter;
+    return get_mean;}
 // Helper function to remove the newline character if present
 void remove_newline(char *line) {
     size_t len = strlen(line);
