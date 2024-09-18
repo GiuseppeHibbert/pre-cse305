@@ -79,8 +79,8 @@ double mean(int field,int head_line, FILE *file){
         free(copying_string);}
     if(counter==0){
         return 0;}
-    int get_mean = total/counter;
-    return get_mean;}
+    double mean =(total/counter);
+    return mean;}
 // Helper function to remove the newline character if present
 void remove_newline(char *line) {
     size_t len = strlen(line);
