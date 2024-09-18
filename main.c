@@ -183,33 +183,34 @@ void find_record_count(FILE *file){
   return 0;
 */
 int main(int argc,char *argv[]){
-    if(argc< 4){
+    if(argc< 3){//program name, an option, filename, more options
         perror("Invalid arguments provided.\n");
         return EXIT_FAILURE;}
-    char *filename= argv[argc-1];  // The CSV file is always the last argument
-    int has_header=0;
+    //get filename by taking last argv value
+    char *filename= argv[argc-1];  
+    int has_header=0; //used to check if header is present or not
     FILE *file=fopen(filename,"r");
     if(!file){
         perror("Error opening file");
         return EXIT_FAILURE;}
-     for(int i=1;i <argc -1;i++){
+    for(int i=1;i <argc -1;i++){// going through command line args except last one 
         if(strcmp(argv[i],"-min") ==0){
-            int field= atoi(argv[++i]);
+            int field= atoi(argv[++i]);//make the field index an int for the min_field function
             double min_val= min_field(field,has_header,file);
             printf("Min:%.2f\n",min_val);}
             else if (strcmp(argv[i],"-max")==0){
-            int field=atoi(argv[++i]);
+                int field=atoi(argv[++i]);// field index to int for max_field funcitojn
             double max_val=max_field(field,has_header,file);
             printf("Max: %.2f\n",max_val);}
             else if(strcmp(argv[i],"-mean")==0){
-            int field = atoi(argv[++i]);
+                int field = atoi(argv[++i]);//field index to int for mean function
             double mean_val = mean(field, has_header, file);
             printf("Mean:%.2f\n", mean_val);}
-            else if(strcmp(argv[i], "-records") == 0) {
-            int field = atoi(argv[++i]);
-            char *value = argv[++i];
-            find_matching_records(field, value, has_header, file);}
-            else if(strcmp(argv[i], "-h") == 0) {
+            else if(strcmp(argv[i], "-records")== 0){
+            int field =atoi(argv[++i]);
+            char *value =argv[++i];
+            find_matching_records(field,value, has_header,file);}
+            else if(strcmp(argv[i],"-h") == 0) {
             has_header=1;}}
     fclose(file);
     return 0;}
