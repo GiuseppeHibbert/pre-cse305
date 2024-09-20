@@ -6,3 +6,5 @@ DATE        UBIT      DURATION    ACTIVITY & TOOL DESCRIPTION
 2024/9/18   jehibber  20 minutes  Read over implementation and added fixes to lines 13, changing str to string. Added library <ctype.h> for function isdigit. Added a perror statement for invalid arguments.
 2024/9/18   jehibber  60 minutes  Begun implementing the number of records command-line argument.
 2024/9/18   jehibber  4 hours	  Added the function for find_record_count which returns the record count of the file provided, and the function display_field_count which outputs the number of fields found in the text file. Added <stdbool.h> for boolean usage.
+2024/9/19   jehibber  20 minutes  Fixed bugs inside the find_record_count function in the comparisons between argv[i] and "-h", changed to use the strcmp function. Also fixed a simple bug, == was used where = was meant inside if statements for bool flags.
+2024/9/20   jehibber  10 minutes  Fixed a syntax error in display_field_count(), while loop had need an extra set of parentheses.

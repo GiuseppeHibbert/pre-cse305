@@ -157,12 +157,12 @@ void find_record_count(FILE *file, int argc, char *argv[]){
     bool headerPresent = false;
     bool recordsRequested = false;
     for (int i=1; i<argc-1; i++){ // Traverse the command-line arguments and search for three things, is header provided, is record provided, and are they both provided?
-        if (argv[i] == "-h"){
-            headerPresent == true;
+        if (strcmp(argv[i], "-h") == 0){
+            headerPresent = true;
                     
         }
-        if (argv[i] == "-r"){
-            recordsRequested == true;
+        if (strcmp(argv[i], "-r") == 0){
+            recordsRequested = true;
                     
         }
     }
@@ -200,7 +200,7 @@ void find_record_count(FILE *file, int argc, char *argv[]){
 void display_field_count(FILE *file, int argc, char * argv[]){
     bool fieldCountRequested = false;
     for (int i=1; i<argc-1;i++){
-        if (argv[i] == "-f"){
+        if (strcmp(argv[i], "-f") == 0){
             fieldCountRequested = true;
                     
         }
@@ -215,8 +215,8 @@ void display_field_count(FILE *file, int argc, char * argv[]){
     int fieldCount = 0;
     bool startquoteFlag = false;
     bool endquoteFlag = false;
-
-    while(cur = fgetc(file)!='\0'){
+    
+    while((cur = fgetc(file))!='\0'){
         if(cur == '"' && !startquoteFlag && !endquoteFlag){ // String begun, disregard all commas until the end quote is present, followed by a comma.
             startquoteFlag = true;
             continue;
