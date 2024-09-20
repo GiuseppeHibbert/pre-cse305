@@ -221,7 +221,8 @@ void find_record_count(FILE *file, int argc, char *argv[]){
     }
     if (recordsRequested && headerPresent){ // W.I.P -- Traverse the whole file and for each line read in not including the header line add one, To be added the same function when the header is not present
         int lineCount = 0;
-        char *line = fgets(line,Line_max,file);
+        char *line = NULL;
+        line = fgets(line,Line_max,file);
                    while(line!=NULL){
                     line = fgets(line, Line_max, file);
                     lineCount++;
@@ -231,7 +232,8 @@ void find_record_count(FILE *file, int argc, char *argv[]){
     }
     else{
         int lineCount = 1;
-        char *line = fgets(line,Line_max,file);
+        char *line = NULL;
+        line = fgets(line,Line_max,file);
         while(line!=NULL){
 
             line = fgets(line,Line_max,file);
