@@ -157,43 +157,55 @@ void find_matching_records(const char *field_spec, const char *target_value, int
     int first_line = 1;
     int field_index = -1;
     double target_number = atof(target_value);  // Convert the target value to a number if it's numeric
-    double tolerance = 0.001;
+    double tolerance = 0.001;  // Float comparison tolerance
 
-    rewind(file);  
+    rewind(file);  // Reset file pointer to the beginning
+
     // If the file has a header, find the field index based on the field name
     if (has_header && fgets(line, sizeof(line), file)) {
         remove_newline(line);
         if (is_a_number(field_spec)) {
             field_index = atoi(field_spec);
         } else {
-            field_index = index_by_fieldname(line, field_spec);
+            field_index = index_by_fieldname(line, field_spec);  // Get index by field name
             if (field_index == -1) {
                 fprintf(stderr, "Field name '%s' not found in the header.\n", field_spec);
                 return;
             }
         }
-        first_line = 0;
+        first_line = 0;  // Header processed, skip in data
+    } else if (!has_header) {
+        // field_spec as an index if there's no header
+        if (is_a_number(field_spec)) {
+            field_index = atoi(field_spec);
+        } else {
+            fprintf(stderr, "Field name specified but no header found.\n");
+            return;
+        }
     }
     while (fgets(line, sizeof(line), file)) {
         char final_line[Line_max];
-        strcpy(final_line, line);  // Copy the whole line to return if match is found
+        strcpy(final_line, line);  // Copy the whole line for output
         remove_newline(line);
+
         if (first_line && has_header) {
             first_line = 0;
             continue;  // Skip the header
         }
+
         char *fields[Field_max];
         int field_count = csv_parse(line, fields, Field_max);
         if (field_index >= field_count) {
-            fprintf(stderr, "Field index out of range.\n");
+            fprintf(stderr, "Error: Field index out of range.\n");
             return;
         }
+        // Compare if both values are numbers
         if (is_a_number(target_value) && is_a_number(fields[field_index])) {
             double field_number = atof(fields[field_index]);
             if (float_equals(field_number, target_number, tolerance)) {
                 printf("%s\n", final_line);  // Print the matching line
             }
-        } else {  // Otherwise, compare as strings
+        } else {  // Compare as strings
             if (strcmp(fields[field_index], target_value) == 0) {
                 printf("%s\n", final_line);  // Print the matching line
             }
