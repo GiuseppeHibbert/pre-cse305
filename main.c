@@ -380,9 +380,6 @@ int main(int argc,char *argv[]){
             }
             double max_val= max_field(field,has_header,file);
             printf("Max:%.2f\n",max_val);
-            int field= atoi(argv[++i]);//make the field index an int for the max_field function
-            double max_val= max_field(field,has_header,file);
-            printf("Max:%.2f\n",max_val);
         }
         else if(strcmp(argv[i],"-mean")==0){
             char *lexVal = argv[i++];
@@ -390,9 +387,6 @@ int main(int argc,char *argv[]){
             if (field == -1){
                 return EXIT_FAILURE;
             }
-            double mean_val= mean(field,has_header,file);
-            printf("Mean:%.2f\n",mean_val);
-            int field= atoi(argv[++i]);//make the field index an int for the mean function
             double mean_val= mean(field,has_header,file);
             printf("Mean:%.2f\n",mean_val);
         }
