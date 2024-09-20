@@ -5,8 +5,13 @@
 #include <limits.h>
 #include <ctype.h>
 #include <stdbool.h>
+#include <math.h>  
 #define Line_max 999
 #define Field_max 999 
+
+int float_equals(double a, double b, double tolerance) {
+    return fabs(a - b) < tolerance;
+}
   
 int is_a_number(const char *string){
     char *string_to_strip=strdup(string); 
@@ -92,48 +97,86 @@ double mean(int field,int head_line, FILE *file){
 // Helper function to remove the newline character if present
 void remove_newline(char *line) {
     size_t len = strlen(line);
-    if (len > 0 && line[len - 1] == '\n') {
+     if (len > 0 && (line[len - 1] == '\n' || line[len - 1] == '\r')) {
         line[len - 1] = '\0';
     }
 }
 
-//CSV parser that handles quoted fields
+//Trim extra spaces
+char *trim(char *str) {
+    char *last;
+    while (isspace((unsigned char)*str)) str++;
+    if (*str == 0)
+        return str;
+    last = str + strlen(str) - 1;
+    while (last > str && isspace((unsigned char)*last)) last--;
+    *(last + 1) = 0;
+    return str;
+}
+
+//parse the csv and returning field_count
 int csv_parse(char *line, char *fields[], int max_fields) {
     int field_count = 0;
     int quotes = 0;
     char *field_start = line;
     for (char *ptr = line; *ptr != '\0'; ++ptr) {
         if (*ptr == '"') {
-            quotes = !quotes;  // Toggle quote state
+            quotes = !quotes;  // change quote state
         } else if (*ptr == ',' && !quotes) {
-            *ptr = '\0';  // End of field
-            fields[field_count++] = field_start;
+            *ptr = '\0';
+            fields[field_count++] = trim(field_start);  // Trim the field value
             field_start = ptr + 1;
             if (field_count >= max_fields) {
                 break;
             }
         }
     }
-    fields[field_count++] = field_start;  // Add last field
-    // Remove quotes from fields, if any
-    for (int i = 0; i < field_count; i++) {
-        if (fields[i][0] == '"' && fields[i][strlen(fields[i]) - 1] == '"') {
-            fields[i][strlen(fields[i]) - 1] = '\0';  
-            fields[i]++; 
-        }
-    }
+    fields[field_count++] = trim(field_start);  // Trimming last field
     return field_count;
 }
 
-// Function to find and print records where the specified field matches the value.
-void find_matching_records(int field_index, const char *target_value, int has_header, FILE *file) {
-    char line[LINE_MAX];
+int index_by_fieldname(const char *header_line, const char *field_name) {
+    char *fields[Field_max];
+    char *n_header = strdup(header_line);
+    remove_newline(n_header);  // Remove newline from the header line
+    int field_count = csv_parse(n_header, fields, Field_max);
+    int field_index = -1;
+    for (int i = 0; i < field_count; i++) {
+        if (strcasecmp(fields[i], field_name) == 0) {
+            field_index = i;
+            break;
+        }
+    }
+    free(n_header);
+    return field_index;
+}
+
+// Finding the matching record with either the header or the field_index and printing it out
+void find_matching_records(const char *field_spec, const char *target_value, int has_header, FILE *file) {
+    char line[Line_max];
     int first_line = 1;
-    double target_number = atof(target_value);
-    rewind(file); 
+    int field_index = -1;
+    double target_number = atof(target_value);  // Convert the target value to a number if it's numeric
+    double tolerance = 0.001;
+
+    rewind(file);  
+    // If the file has a header, find the field index based on the field name
+    if (has_header && fgets(line, sizeof(line), file)) {
+        remove_newline(line);
+        if (is_a_number(field_spec)) {
+            field_index = atoi(field_spec);
+        } else {
+            field_index = index_by_fieldname(line, field_spec);
+            if (field_index == -1) {
+                fprintf(stderr, "Field name '%s' not found in the header.\n", field_spec);
+                return;
+            }
+        }
+        first_line = 0;
+    }
     while (fgets(line, sizeof(line), file)) {
         char final_line[Line_max];
-        strcpy(final_line, line);// copying the whole line to return if match found
+        strcpy(final_line, line);  // Copy the whole line to return if match is found
         remove_newline(line);
         if (first_line && has_header) {
             first_line = 0;
@@ -142,16 +185,21 @@ void find_matching_records(int field_index, const char *target_value, int has_he
         char *fields[Field_max];
         int field_count = csv_parse(line, fields, Field_max);
         if (field_index >= field_count) {
-            fprintf(stderr, "Error: Field index out of range.\n");
+            fprintf(stderr, "Field index out of range.\n");
             return;
         }
-        double field_number = atof(fields[field_index]);
-        if (field_number == target_number) {
-            printf("%s\n", final_line);  // Print matching line
+        if (is_a_number(target_value) && is_a_number(fields[field_index])) {
+            double field_number = atof(fields[field_index]);
+            if (float_equals(field_number, target_number, tolerance)) {
+                printf("%s\n", final_line);  // Print the matching line
+            }
+        } else {  // Otherwise, compare as strings
+            if (strcmp(fields[field_index], target_value) == 0) {
+                printf("%s\n", final_line);  // Print the matching line
+            }
         }
     }
 }
-
 // Determines the record count of the file. It will return the number of lines if no header is present, and if the header is present it will return number of lines minus one.
 void find_record_count(FILE *file, int argc, char *argv[]){
     bool headerPresent = false;
@@ -291,9 +339,9 @@ int main(int argc,char *argv[]){
             double mean_val = mean(field, has_header, file);
             printf("Mean:%.2f\n", mean_val);}
             else if(strcmp(argv[i], "-records")== 0){
-            int field =atoi(argv[++i]);
-            char *value =argv[++i];
-            find_matching_records(field,value, has_header,file);}
+            char *field_spec = argv[++i];  // Field name or index
+            char *value = argv[++i];  // Value to match
+            find_matching_records(field_spec,value, has_header,file);}
             else if(strcmp(argv[i],"-h") == 0) {
             has_header=1;}}
     
