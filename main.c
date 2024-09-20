@@ -298,6 +298,29 @@ void display_field_count(FILE *file, int argc, char * argv[]){
     
 }
 
+int h(int has_header, void *argv, FILE *file) {
+    rewind(file);
+    int indexVal;
+    if(has_header == 1){
+        if((is_a_number(argv) == 0) ){
+            printf("Has Header but Given Integer Arg");
+            return -1;
+        } else {
+            int indexVal;
+            char headerLine[Line_max];
+            fgets(headerLine, Line_max, file);
+            indexVal = index_by_fieldname(headerLine, argv);
+        }
+    } else if(has_header == 0){
+        if((is_a_number(argv) == 1)){
+            printf("Has No Header but Given Text Arg");
+            return -1;
+        } else {
+            int indexVal = atoi(argv);
+        }
+    }
+    return indexVal;
+}
 
 /*int main(int argc, char *argv[]) {
     if (argc < 4) {
@@ -329,23 +352,53 @@ int main(int argc,char *argv[]){
         return EXIT_FAILURE;}
     for(int i=1;i <argc -1;i++){// going through command line args except last one 
         if(strcmp(argv[i],"-min") ==0){
-            int field= atoi(argv[++i]);//make the field index an int for the min_field function
+            char *lexVal = argv[i++];
+            int field = h(has_header,lexVal, file);
+            if (field == -1){
+                return EXIT_FAILURE;
+            }
             double min_val= min_field(field,has_header,file);
-            printf("Min:%.2f\n",min_val);}
-            else if (strcmp(argv[i],"-max")==0){
-                int field=atoi(argv[++i]);// field index to int for max_field funcitojn
-            double max_val=max_field(field,has_header,file);
-            printf("Max: %.2f\n",max_val);}
-            else if(strcmp(argv[i],"-mean")==0){
-                int field = atoi(argv[++i]);//field index to int for mean function
-            double mean_val = mean(field, has_header, file);
-            printf("Mean:%.2f\n", mean_val);}
-            else if(strcmp(argv[i], "-records")== 0){
-            char *field_spec = argv[++i];  // Field name or index
-            char *value = argv[++i];  // Value to match
-            find_matching_records(field_spec,value, has_header,file);}
-            else if(strcmp(argv[i],"-h") == 0) {
-            has_header=1;}}
+            printf("Min:%.2f\n",min_val);
+        }
+        else if (strcmp(argv[i],"-max")==0){
+            char *lexVal = argv[i++];
+            int field = h(has_header,lexVal, file);
+            if (field == -1){
+                return EXIT_FAILURE;
+            }
+            double max_val= max_field(field,has_header,file);
+            printf("Max:%.2f\n",max_val);
+            int field= atoi(argv[++i]);//make the field index an int for the max_field function
+            double max_val= max_field(field,has_header,file);
+            printf("Max:%.2f\n",max_val);
+        }
+        else if(strcmp(argv[i],"-mean")==0){
+            char *lexVal = argv[i++];
+            int field = h(has_header,lexVal, file);
+            if (field == -1){
+                return EXIT_FAILURE;
+            }
+            double mean_val= mean(field,has_header,file);
+            printf("Mean:%.2f\n",mean_val);
+            int field= atoi(argv[++i]);//make the field index an int for the mean function
+            double mean_val= mean(field,has_header,file);
+            printf("Mean:%.2f\n",mean_val);
+        }
+        else if(strcmp(argv[i], "-records")== 0){
+            if(has_header == 1){
+                char *field_spec = argv[++i];  // Field name or index
+                char *value = argv[++i];  // Value to match
+                find_matching_records(field_spec,value, has_header,file);
+            } else {
+                int field= atoi(argv[++i]);
+                char *value =argv[++i];
+                find_matching_records(field,value, has_header,file);
+            }
+        }
+        else if(strcmp(argv[i],"-h") == 0) {
+            has_header=1;}
+        }
     
     fclose(file);
-    return 0;}
+    return EXIT_SUCCESS;
+}

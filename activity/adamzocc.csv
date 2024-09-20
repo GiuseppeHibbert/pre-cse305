@@ -1,0 +1,3 @@
+DATE        UBIT      DURATION    ACTIVITY & TOOL DESCRIPTION
+2024/9/18   adamzocc  2 hrs     First look at functions and first build of -h function but no push as merge conflits created issues
+2024/9/20   adamzocc  4 hrs     Reworked Main function to find EXIT_FAILURES with -h being involved, as well as cleaned up formatting. Built h function with Akshays index_by_fieldname.
