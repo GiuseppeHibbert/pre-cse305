@@ -110,7 +110,7 @@ double mean(int field,int head_line, FILE *file){
     if(counter ==0){
         fprintf(stderr,"no numbers in field %d\n",field);
         exit(EXIT_FAILURE);}
-    return round((total/counter)*100)/100.0;}
+    return (total/counter);}
 // Helper function to remove the newline character if present
 void remove_newline(char *line) {
     size_t len = strlen(line);
