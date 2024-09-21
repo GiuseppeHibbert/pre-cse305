@@ -411,6 +411,9 @@ int main(int argc,char *argv[]){
             has_header=1;}
         }
     
+    find_record_count(file, argc, argv);
+    display_field_count(file, argc, argv);
+    
     fclose(file);
     return EXIT_SUCCESS;
 }
