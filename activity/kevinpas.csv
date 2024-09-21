@@ -6,3 +6,4 @@ DATE        UBIT      DURATION    ACTIVITY & TOOL DESCRIPTION
 2024/9/18   kevinpas  35 minutes  Finished the min field code in main.c. Finished max field by switching comparisons on the min field function"
 2024/9/18   kevinpas  30 minutes  Finished the mean field code in main.c  
 2024/9/18   kevinpas  120 minutes Working with teammates to work on main function. Also worked on my own function
+2024/9/20   kevinpas  150 minutes Finished fixing issues with min max and mean so that it would handle headers,and parse correctly through fields
