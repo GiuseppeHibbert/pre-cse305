@@ -110,8 +110,7 @@ double mean(int field,int head_line, FILE *file){
     if(counter ==0){
         fprintf(stderr,"no numbers in field %d\n",field);
         exit(EXIT_FAILURE);}
-    return total/counter;}
-
+    return round((total/counter)*100)/100.0;}
 // Helper function to remove the newline character if present
 void remove_newline(char *line) {
     size_t len = strlen(line);
@@ -360,17 +359,16 @@ int main(int argc,char *argv[]){
             char *lexVal = argv[++i];
             int field = h(has_header,lexVal, file);
             if (field == -1){
-                return EXIT_FAILURE;
-            }
+                return EXIT_FAILURE;         }
+            rewind(file);
             double min_val= min_field(field,has_header,file);
-            printf("Min:%.2f\n",min_val);
-        }
+            printf("Min:%.2f\n",min_val);        }
         else if (strcmp(argv[i],"-max")==0){
             char *lexVal = argv[++i];
             int field = h(has_header,lexVal, file);
             if (field == -1){
-                return EXIT_FAILURE;
-            }
+                return EXIT_FAILURE;}
+            rewind(file);
             double max_val= max_field(field,has_header,file);
             printf("Max:%.2f\n",max_val);}
         else if(strcmp(argv[i],"-mean")==0){
@@ -379,6 +377,7 @@ int main(int argc,char *argv[]){
             if (field == -1){
                 return EXIT_FAILURE;
             }
+            rewind(file);
             double mean_val= mean(field,has_header,file);
             printf("Mean:%.2f\n",mean_val);
         }
