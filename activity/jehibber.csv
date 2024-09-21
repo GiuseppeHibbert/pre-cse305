@@ -9,3 +9,4 @@ DATE        UBIT      DURATION    ACTIVITY & TOOL DESCRIPTION
 2024/9/19   jehibber  20 minutes  Fixed bugs inside the find_record_count function in the comparisons between argv[i] and "-h", changed to use the strcmp function. Also fixed a simple bug, == was used where = was meant inside if statements for bool flags.
 2024/9/20   jehibber  10 minutes  Fixed a syntax error in display_field_count(), while loop had need an extra set of parentheses.
 2024/9/20   jehibber  5 minutes	  Initialized char *line to NULL, where before it was not initialized to NULL, and it prompted -Wmaybe-uninitialized.
+2024/9/20   jehibber  120 minutes Fixed previous bugs regarding display_field_count and find_record_count, now both functions correctly return the field and record counts. Fgets was being used incorrectly.
