@@ -219,43 +219,47 @@ void find_record_count(FILE *file, int argc, char *argv[]){
     for (int i=1; i<argc-1; i++){ // Traverse the command-line arguments and search for three things, is header provided, is record provided, and are they both provided?
         if (strcmp(argv[i], "-h") == 0){
             headerPresent = true;
+
                     
         }
         if (strcmp(argv[i], "-r") == 0){
             recordsRequested = true;
+
                     
         }
     }
     if (!recordsRequested){
-        printf("Records not requested.\n");
+        //printf("Records not requested.\n");
         return;
+
             
     }
     if (recordsRequested && headerPresent){ // W.I.P -- Traverse the whole file and for each line read in not including the header line add one, To be added the same function when the header is not present
         int lineCount = 0;
-        char *line = NULL;
-        line = fgets(line,Line_max,file);
-                   while(line!=NULL){
-                    line = fgets(line, Line_max, file);
-                    lineCount++;
-                            
-                }
+        char line[Line_max];
+        while(fgets(line,sizeof(line),file)){
+            lineCount++;
+                    
+        }
+        lineCount--; // so the last line isn't counted
         printf("%d\n", lineCount);
     }
     else{
         int lineCount = 1;
-        char *line = NULL;
-        line = fgets(line,Line_max,file);
-        while(line!=NULL){
+        char line[Line_max];
 
-            line = fgets(line,Line_max,file);
+        while(fgets(line,sizeof(line),file)){
             lineCount++;
+
                     
         }
+        lineCount--; // so the last line isn't counted
         printf("%d\n", lineCount);
+
             
     }
-    printf("find_record_count success\n");
+    //printf("find_record_count success\n");
+
     
 }
 // Reads in the file's first line and determines the number of fields.
@@ -264,21 +268,24 @@ void display_field_count(FILE *file, int argc, char * argv[]){
     for (int i=1; i<argc-1;i++){
         if (strcmp(argv[i], "-f") == 0){
             fieldCountRequested = true;
+
                     
         }
+
             
     }
     if (!fieldCountRequested){
-        printf("Field count not requested.\n");
+        //printf("Field count not requested.\n");
         return;
+
             
     }
     char cur;
     int fieldCount = 0;
     bool startquoteFlag = false;
     bool endquoteFlag = false;
-    
-    while((cur = fgetc(file))!='\0'){
+
+    while((cur = (char)fgetc(file))!= '\n'){
         if(cur == '"' && !startquoteFlag && !endquoteFlag){ // String begun, disregard all commas until the end quote is present, followed by a comma.
             startquoteFlag = true;
             continue;
@@ -296,17 +303,16 @@ void display_field_count(FILE *file, int argc, char * argv[]){
             continue;
                     
         }
-
-
             
     }
-    if(cur=='\0'){
+    if(cur=='\n'){
         fieldCount++;
             
     }
-    printf("%d", fieldCount);
+    printf("%d\n", fieldCount);
 
-    printf("fieldCount success\n");
+    //printf("fieldCount success\n");
+
     
 }
 
