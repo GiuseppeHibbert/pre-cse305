@@ -12,7 +12,33 @@
 int float_equals(double a, double b, double tolerance) {
     return fabs(a - b) < tolerance;
 }
-  
+char *trim(char *str) {
+    char *last;
+    while (isspace((unsigned char)*str)) str++;
+    if (*str == 0)
+        return str;
+    last = str + strlen(str) - 1;
+    while (last > str && isspace((unsigned char)*last)) last--;
+    *(last + 1) = 0;
+    return str;
+}
+//need diff handling for mean,max,min
+char **csv_line_handling(char *line, int *num_fields) {
+    char **fields=malloc(Line_max *sizeof(char *));
+    char *split_line;
+    int ase=0;
+    int check_quotes=0;
+    char *first=line;
+    for(char *track=line;*track!='\0';track++) {
+        if(*track == '"'){
+            check_quotes=!check_quotes;}// checking if quotes here
+        else if(*track==','&&!check_quotes){
+            *track='\0';
+            fields[ase++] =trim(first);
+            first=track +1;}}
+    fields[ase++]=trim(first);
+    *num_fields=ase;
+    return fields;}  
 int is_a_number(const char *string){
     char *string_to_strip=strdup(string); 
     if(string_to_strip==NULL){return 0;}
@@ -26,74 +52,66 @@ int is_a_number(const char *string){
             return 0;}}
     free(string_to_strip);
     return 1;}
-double min_field(int field,int head_line, FILE *file){
-    double min = DBL_MAX;// using the max value to compare with the current fields number 
-    int first_line_field_val = 1;// first line
-    char line_on[Line_max];
-    rewind(file);
-        while( fgets(line_on,Line_max, file)){
-            if(first_line_field_val && head_line){
-                first_line_field_val=0;
-                continue;}// This skips the head line if its not a header line for descriptions
-            char *copying_string = strdup(line_on);
-            int current_field = 0;
-            char *break_string =strtok(copying_string,",");
-            while(break_string){
-                if(current_field==field&&is_a_number(break_string)){
-                    double value = atof(break_string);
-                if(value<min){
-                    min=value;}}
-                    break_string=strtok(NULL,",");
-                    current_field++;}
-                    free(copying_string);}
-                    return min;}
-double max_field(int field,int head_line, FILE *file){
-    double max = DBL_MIN;// using the min to use to compare with the current fields number 
-    int first_line_field_val = 1;// first line
-    char line_on[Line_max];
-    rewind(file);
-        while( fgets(line_on,Line_max, file)){
-            if(first_line_field_val && head_line){
-                first_line_field_val=0;
-                continue;}// This skips the head line if its not a header line for descriptions
-            char *copying_string = strdup(line_on);
-            int current_field = 0;
-            char *break_string =strtok(copying_string,",");// splitting up by ","
-            while(break_string){
-                if(current_field==field&&is_a_number(break_string)){
-                    double value = atof(break_string);
-                if(value>max){
-                    max=value;}}
-                    break_string=strtok(NULL,",");
-                    current_field++;}
-                    free(copying_string);}
-                    return max;}          
 
+double min_field(int field,int head_line, FILE *file){
+    double min=DBL_MAX;// using the max value to compare with the current fields number 
+    int first_line_field_val = 1;// first line
+    char line_on[Line_max];
+    if(head_line){// skipping header if there
+        fgets(line_on,Line_max, file);}
+while(fgets(line_on,Line_max,file)){
+        int num_fields;
+        char **fields = csv_line_handling(line_on,&num_fields);
+        if(field<num_fields && isdigit(fields[field][0])){
+            double val=atof(fields[field]);
+            if(first_line_field_val||val<min){
+                min=val;
+                first_line_field_val=0;}}
+               free(fields);}
+
+    if(first_line_field_val){
+        fprintf(stderr,"no numbers in field %d\n",field);
+        exit(EXIT_FAILURE);}
+    return min;}
+double max_field(int field,int head_line, FILE *file){
+    double max=DBL_MAX;// using the max value to compare with the current fields number 
+    int first_line_field_val = 1;// first line
+    char line_on[Line_max];
+    if(head_line){// skipping header if there
+        fgets(line_on,Line_max, file);}
+while(fgets(line_on,Line_max,file)){
+        int num_fields;
+        char **fields = csv_line_handling(line_on,&num_fields);
+        if(field<num_fields &&isdigit(fields[field][0])){
+            double val=atof(fields[field]);
+            if(first_line_field_val||val>max){
+                max=val;
+                first_line_field_val=0;}}
+        free(fields);}
+    if(first_line_field_val){
+        fprintf(stderr,"no numbers in field %d\n",field);
+        exit(EXIT_FAILURE);}
+    return max;}
 double mean(int field,int head_line, FILE *file){
     int counter= 0;// counts the lines
     double total=0.0; // add amount in each line to this
     int first_line_field_val=1;
     char line_on[Line_max];
-    rewind(file);
-    while (fgets(line_on,Line_max,file)){
-        if (first_line_field_val &&head_line){
-            first_line_field_val =0;
-            continue;}
-        char *copying_string=strdup(line_on);
-        int current_field=0;
-        char *break_string =strtok(copying_string,",");// splitting up by ","
-        while(break_string){
-            if(current_field==field &&is_a_number(break_string)) {
-                double value= atof(break_string);
-                total+=value;
-                counter++;}
-            break_string =strtok(NULL, ",");
-            current_field++;}
-        free(copying_string);}
-    if(counter==0){
-        return 0;}
-    double mean =(total/counter);
-    return mean;}
+    if(head_line){// skips header if there
+        fgets(line_on,Line_max,file);}
+    while (fgets(line_on,Line_max,file)) {
+        int num_fields;
+        char **fields=csv_line_handling(line_on,&num_fields);
+        if (field<num_fields && isdigit(fields[field][0])) {
+            double vals = atof(fields[field]);
+            total+= vals;
+            counter++;}
+          free(fields);}
+    if(counter ==0){
+        fprintf(stderr,"no numbers in field %d\n",field);
+        exit(EXIT_FAILURE);}
+    return total/counter;}
+
 // Helper function to remove the newline character if present
 void remove_newline(char *line) {
     size_t len = strlen(line);
@@ -101,19 +119,6 @@ void remove_newline(char *line) {
         line[len - 1] = '\0';
     }
 }
-
-//Trim extra spaces
-char *trim(char *str) {
-    char *last;
-    while (isspace((unsigned char)*str)) str++;
-    if (*str == 0)
-        return str;
-    last = str + strlen(str) - 1;
-    while (last > str && isspace((unsigned char)*last)) last--;
-    *(last + 1) = 0;
-    return str;
-}
-
 //parse the csv and returning field_count
 int csv_parse(char *line, char *fields[], int max_fields) {
     int field_count = 0;
@@ -241,9 +246,9 @@ void find_record_count(FILE *file, int argc, char *argv[]){
             lineCount++;
                     
         }
-        lineCount--; // so the last line isn't counted
-        printf("%d\n", lineCount);
-    }
+        if(headerPresent){
+    lineCount--;}
+        printf("%d\n", lineCount);}
     else{
         int lineCount = 1;
         char line[Line_max];
@@ -253,7 +258,8 @@ void find_record_count(FILE *file, int argc, char *argv[]){
 
                     
         }
-        lineCount--; // so the last line isn't counted
+        if(headerPresent){
+            lineCount--;}
         printf("%d\n", lineCount);
 
             
@@ -317,46 +323,27 @@ void display_field_count(FILE *file, int argc, char * argv[]){
 }
 
 int h(int has_header, void *argv, FILE *file) {
+
     rewind(file);
+    char headerLine[Line_max];
     int indexVal;
     if(has_header == 1){
-        if((is_a_number(argv) == 0) ){
+        if(is_a_number((char *)argv)){
             printf("Has Header but Given Integer Arg");
-            return -1;
-        } else {
-            int indexVal;
-            char headerLine[Line_max];
+            return -1;}
+         else{
             fgets(headerLine, Line_max, file);
-            indexVal = index_by_fieldname(headerLine, argv);
-        }
-    } else if(has_header == 0){
-        if((is_a_number(argv) == 1)){
+            indexVal = index_by_fieldname(headerLine, (char *)argv);
+        if(indexVal== -1) {
+                printf("Error: Field name '%s' not found in head line.\n", (char *)argv);
+                return -1;}}}
+     else if(has_header == 0){
+         if(!is_a_number((char *)argv)){
             printf("Has No Header but Given Text Arg");
-            return -1;
-        } else {
-            int indexVal = atoi(argv);
-        }
-    }
-    return indexVal;
-}
-
-/*int main(int argc, char *argv[]) {
-    if (argc < 4) {
-        perror("Invalid arguments provided.\n");
-        return EXIT_FAILURE;
-    }
-    int field_index = atoi(argv[2]);
-    char *target_value = argv[3];
-    char *filename = argv[4];
-    int has_header = (argc == 6 && strcmp(argv[5], "-h") == 0);
-    FILE *file = fopen(filename, "r");
-    if (!file) {
-        perror("Error opening file");
-        return EXIT_FAILURE;}
-  find_matching_records(field_index, target_value, has_header, file);
-  pclose(file);
-  return 0;
-*/
+            return -1;}
+         else {
+            indexVal = atoi((char *)argv);}}
+    return indexVal;}
 int main(int argc,char *argv[]){
     if(argc< 3){//program name, an option, filename, more options
         perror("Invalid arguments provided.\n");
@@ -370,7 +357,7 @@ int main(int argc,char *argv[]){
         return EXIT_FAILURE;}
     for(int i=1;i <argc -1;i++){// going through command line args except last one 
         if(strcmp(argv[i],"-min") ==0){
-            char *lexVal = argv[i++];
+            char *lexVal = argv[++i];
             int field = h(has_header,lexVal, file);
             if (field == -1){
                 return EXIT_FAILURE;
@@ -379,16 +366,15 @@ int main(int argc,char *argv[]){
             printf("Min:%.2f\n",min_val);
         }
         else if (strcmp(argv[i],"-max")==0){
-            char *lexVal = argv[i++];
+            char *lexVal = argv[++i];
             int field = h(has_header,lexVal, file);
             if (field == -1){
                 return EXIT_FAILURE;
             }
             double max_val= max_field(field,has_header,file);
-            printf("Max:%.2f\n",max_val);
-        }
+            printf("Max:%.2f\n",max_val);}
         else if(strcmp(argv[i],"-mean")==0){
-            char *lexVal = argv[i++];
+            char *lexVal = argv[++i];
             int field = h(has_header,lexVal, file);
             if (field == -1){
                 return EXIT_FAILURE;
@@ -413,7 +399,6 @@ int main(int argc,char *argv[]){
     
     find_record_count(file, argc, argv);
     display_field_count(file, argc, argv);
-    
     fclose(file);
     return EXIT_SUCCESS;
 }
